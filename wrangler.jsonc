@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "portfolio",
+  "compatibility_date": "2026-09-01",
+
+  /**
+   * Static assets only — there is deliberately no `main`, so no Worker script
+   * runs. Every route in this site is prerendered by `next build` with
+   * `output: "export"`, so requests are served straight from Cloudflare's
+   * asset storage: no cold starts, no CPU time, no request billing.
+   */
+  "assets": {
+    "directory": "./out",
+
+    /**
+     * Matches Next's `trailingSlash: true`, which emits `/path/index.html`.
+     * Without this the two disagree and `/about` would 404 or redirect-loop.
+     */
+    "html_handling": "force-trailing-slash",
+
+    /** Next generates out/404.html for unmatched paths. */
+    "not_found_handling": "404-page"
+  },
+
+  "observability": {
+    "enabled": true
+  }
+}

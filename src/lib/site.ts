@@ -1,11 +1,15 @@
 import { profile } from "@/data/profile";
 
 /**
- * Canonical origin. Set NEXT_PUBLIC_SITE_URL at build time once the domain is
- * decided; the fallback keeps metadata valid in development.
+ * Canonical origin, used for canonical links, OpenGraph, robots.txt and the
+ * sitemap.
+ *
+ * The fallback is the live Cloudflare URL, so a plain `next build` produces
+ * correct metadata with no configuration. Set NEXT_PUBLIC_SITE_URL to override
+ * it once a custom domain is attached.
  */
 export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://bhupeshpatni.dev";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfolio.canvax1.workers.dev";
 
 export const siteName = `${profile.name} — ${profile.role}`;
 
