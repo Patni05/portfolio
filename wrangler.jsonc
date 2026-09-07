@@ -22,6 +22,21 @@
     "not_found_handling": "404-page"
   },
 
+  /**
+   * Custom domain.
+   *
+   * Uncomment once bhupesh.dev is added as a zone in this Cloudflare account.
+   * `custom_domain: true` makes Cloudflare create and manage the DNS record
+   * and the certificate itself — no manual CNAME needed.
+   *
+   * The apex and www are listed separately because a custom domain route does
+   * not cover subdomains implicitly.
+   */
+  // "routes": [
+  //   { "pattern": "bhupesh.dev", "custom_domain": true },
+  //   { "pattern": "www.bhupesh.dev", "custom_domain": true }
+  // ],
+
   "observability": {
     "enabled": true
   }

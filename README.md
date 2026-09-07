@@ -89,6 +89,38 @@ value scales every `rem` in the design (type *and* spacing) together.
 [src/lib/boot.ts](src/lib/boot.ts) — `HOLD_MS` and `FADE_MS`. Set `HOLD_MS` to
 `0` to drop the intro entirely.
 
+### Attach the bhupesh.dev custom domain
+
+Everything is staged for this; it is three steps once the domain is bought.
+
+1. **Register it.** Cloudflare dashboard → Domain Registration → Register
+   Domains → `bhupesh.dev`. Cloudflare Registrar sells at wholesale cost with
+   no markup, and registering it there adds the zone to the account
+   automatically (no nameserver change needed).
+
+2. **Point the Worker at it.** Uncomment the `routes` block in
+   [wrangler.jsonc](wrangler.jsonc). `custom_domain: true` makes Cloudflare
+   create the DNS record and issue the certificate itself.
+
+3. **Rebuild with the new canonical URL and ship:**
+
+   ```bash
+   NEXT_PUBLIC_SITE_URL=https://bhupesh.dev npm run deploy
+   ```
+
+   Then make it the permanent default by changing the fallback in
+   [src/lib/site.ts](src/lib/site.ts) from the workers.dev URL to
+   `https://bhupesh.dev`, so a plain `npm run deploy` stays correct.
+
+`.dev` is on the HSTS preload list, so browsers require HTTPS on it — that is
+handled automatically by the Cloudflare-managed certificate.
+
+Note: the `canvax1` in the current workers.dev URL is the account-level
+subdomain, shared by every Worker on the account. Changing it would rename
+`canvasx.canvax1.workers.dev` too, which this site links to and the resume PDF
+references — so a custom domain is the right way to get rid of it, not a
+subdomain change.
+
 ### Set the domain
 
 `NEXT_PUBLIC_SITE_URL=https://yourdomain.com` at build time. It feeds canonical
