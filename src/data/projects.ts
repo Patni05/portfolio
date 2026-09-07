@@ -1,3 +1,5 @@
+import { workersUrl } from "@/lib/cloudflare";
+
 export type ProjectLink = {
   label: string;
   /** `null` means the URL has not been supplied yet — the button renders disabled. */
@@ -74,7 +76,7 @@ export const projects: Project[] = [
     ],
     visual: "scribble",
     links: {
-      live: { label: "Live", href: "https://canvasx.canvax1.workers.dev" },
+      live: { label: "Live", href: workersUrl("canvasx") },
       code: { label: "Code", href: "https://github.com/Patni05/canvasx" },
     },
   },

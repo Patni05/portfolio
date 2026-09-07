@@ -1,4 +1,5 @@
 import { profile } from "@/data/profile";
+import { workersUrl } from "@/lib/cloudflare";
 
 /**
  * Canonical origin, used for canonical links, OpenGraph, robots.txt and the
@@ -9,7 +10,7 @@ import { profile } from "@/data/profile";
  * it once a custom domain is attached.
  */
 export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://bhupesh.canvax1.workers.dev";
+  process.env.NEXT_PUBLIC_SITE_URL ?? workersUrl("bhupesh");
 
 export const siteName = `${profile.name} — ${profile.role}`;
 

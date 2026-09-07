@@ -89,43 +89,54 @@ value scales every `rem` in the design (type *and* spacing) together.
 [src/lib/boot.ts](src/lib/boot.ts) — `HOLD_MS` and `FADE_MS`. Set `HOLD_MS` to
 `0` to drop the intro entirely.
 
-### Attach the bhupesh.dev custom domain
+### Change the workers.dev URL
 
-Everything is staged for this; it is three steps once the domain is bought.
+Every workers.dev URL is `<worker-name>.<subdomain>.workers.dev` — always three
+labels. A bare `name.workers.dev` is not obtainable; that namespace is
+Cloudflare's own. (Verified: this account's own `canvax1.workers.dev` root
+serves nothing.)
 
-1. **Register it.** Cloudflare dashboard → Domain Registration → Register
-   Domains → `bhupesh.dev`. Cloudflare Registrar sells at wholesale cost with
-   no markup, and registering it there adds the zone to the account
-   automatically (no nameserver change needed).
+So there are two levers:
 
-2. **Point the Worker at it.** Uncomment the `routes` block in
-   [wrangler.jsonc](wrangler.jsonc). `custom_domain: true` makes Cloudflare
-   create the DNS record and issue the certificate itself.
+| Lever | Where | Effect |
+|---|---|---|
+| **Worker name** (first label) | `name` in [wrangler.jsonc](wrangler.jsonc), then `npm run deploy` | Affects this site only |
+| **Account subdomain** (second label) | Cloudflare dashboard only | Affects **every** Worker on the account |
 
-3. **Rebuild with the new canonical URL and ship:**
+**To change the account subdomain** — dashboard → Workers & Pages → *Your
+subdomain* → **Change**. This cannot be scripted: the public API's subdomain
+endpoint is create-only and rejects an account that already has one with error
+`10036, Account already has an associated subdomain`.
+
+After changing it, update one line — [src/lib/cloudflare.ts](src/lib/cloudflare.ts):
+
+```ts
+export const workersSubdomain = "canvax1"; // <- new subdomain here
+```
+
+Both the site's canonical URL and the CanvasX project link derive from that
+constant, so they cannot drift apart. Then `npm run deploy`.
+
+Be aware the subdomain is shared: changing it also moves
+`canvasx.<subdomain>.workers.dev`, so anywhere that URL is published (resume
+PDF, LinkedIn, repo descriptions) needs updating too.
+
+### Attach a custom domain
+
+A custom domain is the only way to drop the workers.dev subdomain entirely.
+Once the domain is registered and its zone is in this Cloudflare account:
+
+1. Uncomment the `routes` block in [wrangler.jsonc](wrangler.jsonc) and set the
+   pattern to the domain. `custom_domain: true` makes Cloudflare create the DNS
+   record and issue the certificate itself.
+2. Ship it with the new canonical URL:
 
    ```bash
-   NEXT_PUBLIC_SITE_URL=https://bhupesh.dev npm run deploy
+   NEXT_PUBLIC_SITE_URL=https://example.dev npm run deploy
    ```
 
-   Then make it the permanent default by changing the fallback in
-   [src/lib/site.ts](src/lib/site.ts) from the workers.dev URL to
-   `https://bhupesh.dev`, so a plain `npm run deploy` stays correct.
-
-`.dev` is on the HSTS preload list, so browsers require HTTPS on it — that is
-handled automatically by the Cloudflare-managed certificate.
-
-Note: the `canvax1` in the current workers.dev URL is the account-level
-subdomain, shared by every Worker on the account. Changing it would rename
-`canvasx.canvax1.workers.dev` too, which this site links to and the resume PDF
-references — so a custom domain is the right way to get rid of it, not a
-subdomain change.
-
-### Set the domain
-
-`NEXT_PUBLIC_SITE_URL=https://yourdomain.com` at build time. It feeds canonical
-URLs, OpenGraph, `robots.txt` and `sitemap.xml`. Falls back to a placeholder
-otherwise — see [src/lib/site.ts](src/lib/site.ts).
+3. Make it the default by setting that URL as the fallback in
+   [src/lib/site.ts](src/lib/site.ts).
 
 ---
 
