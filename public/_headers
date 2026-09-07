@@ -1,0 +1,28 @@
+# Cloudflare static-asset headers.
+# Files in public/ are copied to the export root, so this lands at /_headers.
+
+# Next's generated icon and OG image are emitted WITHOUT a file extension, so
+# the host cannot infer their type. Without these two rules the favicon and the
+# social preview are served as octet-stream and silently fail to render.
+/icon
+  Content-Type: image/png
+  Cache-Control: public, max-age=3600
+
+/opengraph-image
+  Content-Type: image/png
+  Cache-Control: public, max-age=3600
+
+# Build output is content-hashed, so it can be cached forever.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Fonts are hashed too.
+/_next/static/media/*
+  Cache-Control: public, max-age=31536000, immutable
+  Access-Control-Allow-Origin: *
+
+# Sensible baseline for every response.
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: SAMEORIGIN

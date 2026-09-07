@@ -1,0 +1,476 @@
+/* ================================================================== *
+ * Hero, hero visual, and the intro overlay.
+ *
+ * Split out of components.css because these three are tightly coupled:
+ * the intro releases the hero entrance, which reveals the visual.
+ * ================================================================== */
+
+/* ---------------------------------- *
+ * Hero
+ * ---------------------------------- */
+
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  min-height: 100svh;
+  padding-block: 7.5rem 5rem;
+}
+
+.hero__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+  width: 100%;
+}
+
+.hero__content {
+  min-width: 0;
+}
+
+.hero__prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+  color: var(--text-dim);
+}
+
+.hero__sigil {
+  color: var(--accent);
+}
+
+.hero__prompt-out {
+  color: var(--text);
+}
+
+.hero__name {
+  display: flex;
+  flex-direction: column;
+  font-size: clamp(2.75rem, 9vw, 5.75rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+}
+
+.hero__name-line {
+  display: block;
+}
+
+/* The surname drops to the dim tone, so the name reads as a hierarchy
+   instead of one heavy block. */
+.hero__name-line:last-child {
+  color: var(--text-dim);
+}
+
+/* Technical stack label — small and monospace, clearly below the name. */
+.hero__stack {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 1.6em;
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+}
+
+.hero__stack-dot {
+  flex-shrink: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent-2) 18%, transparent);
+}
+
+.hero__tagline {
+  max-width: 46ch;
+  margin-top: 1.15rem;
+  color: var(--text-dim);
+  font-size: clamp(1.05rem, 1.6vw, 1.15rem);
+  line-height: 1.7;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 2.1rem;
+}
+
+.hero__socials {
+  display: flex;
+  gap: 0.55rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.social-icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.social-icon:hover {
+  color: var(--accent);
+  border-color: color-mix(in oklab, var(--accent) 55%, var(--border));
+  background: color-mix(in oklab, var(--accent) 7%, transparent);
+  box-shadow: 0 2px 14px color-mix(in oklab, var(--accent) 16%, transparent);
+}
+
+.hero__scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 1.75rem;
+  translate: -50% 0;
+  color: var(--text-dim);
+}
+
+/* ---------------------------------- *
+ * Hero entrance
+ *
+ * Visible by DEFAULT, and only held back while the intro is actually on
+ * screen (data-intro). That ordering matters: if the hold were the default,
+ * a visitor with JavaScript disabled would get a permanently blank hero.
+ *
+ * The boot script sets data-hero-ready before paint when the intro is
+ * skipped, so the entrance still plays on a normal load. Each element eases
+ * in on its own --enter-delay, keeping the stagger declarative.
+ * ---------------------------------- */
+
+:root[data-intro] .hero__content > *,
+:root[data-intro] .hero__visual-col,
+:root[data-intro] .hero__scroll-hint {
+  opacity: 0;
+}
+
+:root[data-hero-ready="true"] .hero__content > *,
+:root[data-hero-ready="true"] .hero__visual-col {
+  animation: hero-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--enter-delay, 0ms);
+}
+
+:root[data-hero-ready="true"] .hero__scroll-hint {
+  animation:
+    hero-enter 0.85s cubic-bezier(0.22, 1, 0.36, 1) both,
+    scroll-hint 2.6s ease-in-out 1.6s infinite;
+  animation-delay: var(--enter-delay, 0ms), 1.6s;
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scroll-hint {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.85;
+  }
+}
+
+@media (min-width: 900px) {
+  .hero__grid {
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    gap: 3.5rem;
+  }
+}
+
+/* ---------------------------------- *
+ * Hero visual — node graph + code fragments
+ * ---------------------------------- */
+
+.hero-visual {
+  position: relative;
+  /* Square and capped: it must never dominate the name. */
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.hero-visual__canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.hero-visual__glow {
+  position: absolute;
+  inset: 14%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 40% 35%,
+    color-mix(in oklab, var(--accent) 20%, transparent) 0%,
+    color-mix(in oklab, var(--accent-3) 11%, transparent) 45%,
+    transparent 72%
+  );
+  /* No filter: blur() -- this is already a soft radial-gradient, and
+     blurring it forced a re-raster on every frame of the scale animation. */
+  animation: visual-breathe 14s ease-in-out infinite alternate;
+}
+
+@keyframes visual-breathe {
+  from {
+    transform: scale(0.94);
+    opacity: 0.55;
+  }
+  to {
+    transform: scale(1.06);
+    opacity: 0.9;
+  }
+}
+
+.hero-visual__fragments {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-visual__fragment {
+  position: absolute;
+  padding: 0.28rem 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--accent) 20%, var(--border));
+  border-radius: 5px;
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+  font-size: 0.74rem;
+  letter-spacing: 0.01em;
+  color: var(--text-dim);
+  white-space: nowrap;
+  animation: fragment-float 9s ease-in-out infinite alternate;
+  animation-delay: var(--float-delay, 0s);
+}
+
+@keyframes fragment-float {
+  from {
+    transform: translate3d(0, 4px, 0);
+  }
+  to {
+    transform: translate3d(0, -6px, 0);
+  }
+}
+
+/* Thin corner brackets: frames the panel without adding a solid shape. */
+.hero-visual__bracket {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-color: color-mix(in oklab, var(--accent) 40%, transparent);
+  border-style: solid;
+  border-width: 0;
+}
+
+.hero-visual__bracket[data-corner="tl"] {
+  top: 2%;
+  left: 2%;
+  border-top-width: 1px;
+  border-left-width: 1px;
+}
+
+.hero-visual__bracket[data-corner="br"] {
+  right: 2%;
+  bottom: 2%;
+  border-right-width: 1px;
+  border-bottom-width: 1px;
+}
+
+/* Tablet: below the text, smaller, never behind it. */
+@media (max-width: 899px) {
+  .hero-visual {
+    max-width: 290px;
+    aspect-ratio: 4 / 3;
+    opacity: 0.9;
+  }
+
+  .hero-visual__fragment {
+    font-size: 0.8rem;
+  }
+}
+
+/* Phone: it would crowd the buttons more than it adds. */
+@media (max-width: 520px) {
+  .hero__visual-col {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hero {
+    /* Tighter than 100svh so the tagline and buttons are visible without
+       scrolling on a short phone screen. */
+    min-height: auto;
+    padding-block: 6.5rem 3.5rem;
+  }
+
+  .hero__name {
+    font-size: clamp(3rem, 15vw, 4.5rem);
+    letter-spacing: -0.035em;
+  }
+
+  .hero__actions {
+    gap: 0.6rem;
+    margin-top: 1.8rem;
+  }
+
+  /* Full-width, easily tappable primary action. */
+  .hero__actions .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+    min-height: 48px;
+    font-size: 0.98rem;
+  }
+
+  .hero__socials {
+    gap: 0.7rem;
+    margin-top: 1.75rem;
+  }
+
+  .hero__scroll-hint {
+    display: none;
+  }
+}
+
+/* ---------------------------------- *
+ * Intro overlay
+ * ---------------------------------- */
+
+/* Server-rendered, so it is painted on the first frame. Visibility is driven
+   entirely by data-intro on <html>, set by the boot script before paint —
+   which is what keeps the page from flashing into view and back out. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  place-items: center;
+  background: var(--bg);
+  transition: opacity 0.3s ease;
+}
+
+:root[data-intro="playing"] .intro {
+  display: grid;
+  opacity: 1;
+}
+
+:root[data-intro="leaving"] .intro {
+  display: grid;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  animation: intro-in 0.4s ease both;
+}
+
+@keyframes intro-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.intro__path {
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.intro__sigil {
+  color: var(--accent);
+}
+
+.intro__status {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+}
+
+.intro__track {
+  width: 132px;
+  height: 2px;
+  margin-top: 0.45rem;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+/* Scroll lock while the overlay covers the page. Driven by a class on <html>
+   from the boot script, so no JS has to touch inline styles on <body>. */
+.intro-lock,
+.intro-lock body {
+  overflow: hidden !important;
+}
+
+.intro__bar {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  animation: intro-progress 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes intro-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* ---------------------------------- *
+ * Reduced motion
+ *
+ * The hero must be fully visible with no entrance animation at all, so the
+ * held-back opacity is released unconditionally.
+ * ---------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__content > *,
+  .hero__visual-col,
+  .hero__scroll-hint {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  .hero-visual__glow,
+  .hero-visual__fragment {
+    animation: none !important;
+  }
+}

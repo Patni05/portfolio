@@ -1,0 +1,501 @@
+@import "tailwindcss";
+@import "./components.css";
+@import "./hero.css";
+@import "./parts.css";
+
+/* ------------------------------------------------------------------ *
+ * Theme tokens
+ *
+ * Light is the base definition on bare :root; dark is layered on top,
+ * once for the "system" default and once for the explicit toggle, so
+ * neither direction can win by accident.
+ * ------------------------------------------------------------------ */
+
+:root {
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --surface-2: #f2f2ef;
+  --border: #e0e0d9;
+  --border-strong: #c9c9c0;
+  --text: #17171a;
+  --text-dim: #5c5c66;
+  --accent: #2563eb;
+  --accent-2: #0f9c78;
+  --accent-3: #7c3aed;
+  --accent-contrast: #ffffff;
+  --grain-opacity: 0.025;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px rgb(0 0 0 / 0.06);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-display: var(--font-space-grotesk), var(--font-inter), ui-sans-serif,
+    system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "Cascadia Mono", Menlo,
+    Consolas, monospace;
+
+  /* Written by the scroll listener; drives the progress bar with no re-render. */
+  --scroll-progress: 0;
+
+  color-scheme: light;
+}
+
+/* System preference, for the case where the head script never ran (JS off).
+   Guarded so an explicit "light" choice still wins. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0a0a0b;
+    --surface: #121215;
+    --surface-2: #1a1a1f;
+    --border: #26262b;
+    --border-strong: #3a3a42;
+    --text: #ededf0;
+    --text-dim: #8a8a95;
+    --accent: #4f8dff;
+    --accent-2: #22d3a6;
+    --accent-3: #a855f7;
+    --accent-contrast: #05050a;
+    --grain-opacity: 0.04;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px rgb(0 0 0 / 0.5);
+
+    color-scheme: dark;
+  }
+}
+
+/* Explicit choice via the toggle — wins in both directions. */
+:root[data-theme="dark"] {
+  --bg: #0a0a0b;
+  --surface: #121215;
+  --surface-2: #1a1a1f;
+  --border: #26262b;
+  --border-strong: #3a3a42;
+  --text: #ededf0;
+  --text-dim: #8a8a95;
+  --accent: #4f8dff;
+  --accent-2: #22d3a6;
+  --accent-3: #a855f7;
+  --accent-contrast: #05050a;
+  --grain-opacity: 0.04;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 16px 40px rgb(0 0 0 / 0.5);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border-subtle: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--text);
+  --color-fg-dim: var(--text-dim);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-3: var(--accent-3);
+
+  --font-sans: var(--font-sans);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Lenis handles smooth scrolling; native smooth would fight it. Anchor
+     jumps still work because we route them through Lenis. */
+  scroll-behavior: auto;
+  -webkit-text-size-adjust: 100%;
+
+  /* 17px root instead of 16px.
+     This is the ONLY correct place to scale the design: `rem` resolves
+     against <html>, so setting a size on <body> enlarges inherited text but
+     leaves every rem-based size untouched. Scaling here lifts all type and
+     spacing together. */
+  font-size: 106.25%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-feature-settings: "cv05" 1, "cv08" 1;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.7;
+  letter-spacing: -0.003em;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* The page must never scroll sideways, at any width. */
+  overflow-x: clip;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--accent) 30%, transparent);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+/* Remove the ring for pointer users but keep it for keyboards. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+/* Small headings do not need display-face tracking. */
+h3,
+h4 {
+  letter-spacing: -0.012em;
+}
+
+p {
+  margin: 0;
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+img,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* ------------------------------------------------------------------ *
+ * Layout primitives
+ * ------------------------------------------------------------------ */
+
+.shell {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: clamp(1.25rem, 5vw, 3.5rem);
+}
+
+.section {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(5rem, 12vw, 9rem);
+}
+
+.rule {
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: var(--border);
+}
+
+/* The 3D layer lives behind everything, full-viewport and non-interactive. */
+.scene-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.scene-layer canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ------------------------------------------------------------------ *
+ * CSS fallback background
+ * ------------------------------------------------------------------ */
+
+.fallback-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      120% 80% at 50% -10%,
+      color-mix(in oklab, var(--accent) 10%, transparent) 0%,
+      transparent 60%
+    ),
+    var(--bg);
+}
+
+.fallback-bg__glow {
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  /* A soft radial-gradient instead of filter: blur() on a huge element --
+     same look, no per-frame re-rasterization of a blurred layer. */
+  opacity: 0.5;
+  will-change: transform;
+}
+
+.fallback-bg__glow--one {
+  top: -14vmax;
+  left: -8vmax;
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in oklab, var(--accent) 26%, transparent) 0%,
+    transparent 100%
+  );
+  /* Very slow ambient drift. Transform-only, so it composites on the GPU and
+     never triggers layout. */
+  animation: ambient-drift-a 44s ease-in-out infinite alternate;
+}
+
+.fallback-bg__glow--two {
+  bottom: -18vmax;
+  right: -10vmax;
+  background: radial-gradient(
+    circle closest-side,
+    color-mix(in oklab, var(--accent-3) 24%, transparent) 0%,
+    transparent 100%
+  );
+  animation: ambient-drift-b 58s ease-in-out infinite alternate;
+}
+
+@keyframes ambient-drift-a {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(6vmax, 4vmax, 0) scale(1.12);
+  }
+}
+
+@keyframes ambient-drift-b {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  to {
+    transform: translate3d(-5vmax, -3vmax, 0) scale(1);
+  }
+}
+
+.fallback-bg__motes {
+  position: absolute;
+  inset: 0;
+}
+
+.fallback-bg__motes span {
+  position: absolute;
+  top: calc(var(--i) * 6.5% + 2%);
+  left: calc((var(--i) * 37%) % 96%);
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  opacity: 0.4;
+  animation: mote-drift 22s linear infinite;
+  animation-delay: calc(var(--i) * -1.4s);
+}
+
+@keyframes mote-drift {
+  from {
+    transform: translateY(6vh);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 0.45;
+  }
+  to {
+    transform: translateY(-24vh);
+    opacity: 0;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Grain overlay
+ * ------------------------------------------------------------------ */
+
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* No mix-blend-mode: blending a full-viewport layer costs a composite pass
+     every frame and the effect is invisible at 3-4% opacity anyway. */
+}
+
+/* Effects off: no ambient drift either, so the page is completely static. */
+:root[data-effects="off"] .fallback-bg__glow {
+  animation: none;
+}
+
+/* Grain is pure decoration -- drop it entirely on phones. */
+@media (max-width: 768px) {
+  .grain {
+    display: none;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Shared component styles
+ * ------------------------------------------------------------------ */
+
+.kicker {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+}
+
+.kicker::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+
+.card {
+  /* Solid surface, deliberately NOT backdrop-filter: this class is on ~15
+     elements and each blurred backdrop is a separate offscreen pass that the
+     compositor redoes while scrolling. Opaque is visually equivalent here and
+     costs nothing. */
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-ligatures: none;
+}
+
+/* Mobile: slightly looser leading; the size itself comes from the root scale. */
+@media (max-width: 640px) {
+  body {
+    line-height: 1.72;
+  }
+}
+
+/* Blinking block cursor for the typewriters. */
+.caret {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  margin-left: 0.12em;
+  vertical-align: text-bottom;
+  background: var(--accent);
+  animation: caret-blink 1.05s steps(2, start) infinite;
+}
+
+.caret--sm {
+  width: 0.45em;
+  height: 0.9em;
+}
+
+@keyframes caret-blink {
+  to {
+    visibility: hidden;
+  }
+}
+
+/* Reveal-on-scroll. The transition is stripped under reduced motion. */
+.reveal {
+  opacity: 0;
+  transition:
+    opacity 0.72s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal[data-variant="up"] {
+  transform: translate3d(0, 16px, 0);
+}
+
+/* Cards settle in from very slightly small — subtler than a slide. */
+.reveal[data-variant="scale"] {
+  transform: scale(0.98) translate3d(0, 10px, 0);
+}
+
+.reveal[data-variant="fade"] {
+  transform: none;
+}
+
+.reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* `will-change` only while the element is actually pending, so we are not
+   holding a compositor layer for every one of them for the whole session. */
+.reveal[data-visible="false"] {
+  will-change: opacity, transform;
+}
+
+/* No JavaScript means no IntersectionObserver, so nothing would ever be
+   revealed. Show everything instead of hiding the whole page. */
+.no-js .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ------------------------------------------------------------------ *
+ * Reduced motion
+ *
+ * A first-class path, not a broken one: everything is simply already in
+ * its final state.
+ * ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .caret {
+    animation: none;
+  }
+
+  .fallback-bg__motes {
+    display: none;
+  }
+
+  .fallback-bg__glow {
+    animation: none !important;
+  }
+}
