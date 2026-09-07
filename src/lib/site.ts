@@ -9,7 +9,7 @@ import { profile } from "@/data/profile";
  * it once a custom domain is attached.
  */
 export const siteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://portfolio.canvax1.workers.dev";
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://bhupesh.canvax1.workers.dev";
 
 export const siteName = `${profile.name} — ${profile.role}`;
 
