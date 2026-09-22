@@ -1,5 +1,7 @@
 # Bhupesh Patni — Portfolio
 
+**Live → [bhupesh.canvax1.workers.dev](https://bhupesh.canvax1.workers.dev)**
+
 A single-page, scroll-driven portfolio. Next.js 15 + TypeScript, `react-three-fiber`
 for the ambient WebGL background, a 2D canvas for the hero visual, Lenis for
 inertial scrolling, and pure CSS for every entrance animation.
