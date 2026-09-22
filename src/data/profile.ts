@@ -11,7 +11,7 @@ export const profile = {
   linkedinLabel: "linkedin.com/in/bhupeshpatni",
 
   tagline:
-    "BCA final-year student building full-stack products, real-time collaborative tools, and fine-tuned speech models.",
+    "BCA graduate building full-stack products, real-time collaborative tools, and fine-tuned speech models.",
 
   /** Cycled by the hero typewriter. */
   roles: [
@@ -23,7 +23,7 @@ export const profile = {
   ],
 
   about: [
-    "I'm a final-year BCA student at Graphic Era Hill University, Dehradun, with a CGPA of 8.5+. I build full-stack web applications end to end — from Postgres schemas and REST APIs to the interaction details in the browser.",
+    "I'm a BCA graduate from Graphic Era Hill University, Dehradun, with a CGPA of 8.5+. I build full-stack web applications end to end — from Postgres schemas and REST APIs to the interaction details in the browser.",
     "My work spans a multi-role grocery delivery platform, an infinite real-time collaborative whiteboard, and a fine-tuned Hindi text-to-speech model trained on 80+ GB of speech data. I like problems where architecture matters: plugin systems that stay extensible, dashboards that stay fast, and pipelines that stay reproducible.",
     "Right now I'm looking for a role where I can ship real product and keep going deeper on systems and AI.",
   ],

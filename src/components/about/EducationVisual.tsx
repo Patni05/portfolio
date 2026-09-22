@@ -128,7 +128,7 @@ export function EducationVisual() {
 
       <p className="eduviz__caption mono">
         <span className="eduviz__caption-dot" aria-hidden="true" />
-        final year · 2026
+        graduated · 2026
       </p>
     </div>
   );

@@ -3,7 +3,13 @@ import { Inter, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 import { profile } from "@/data/profile";
-import { personSchema, siteDescription, siteName, siteUrl } from "@/lib/site";
+import {
+  ogImage,
+  personSchema,
+  siteDescription,
+  siteName,
+  siteUrl,
+} from "@/lib/site";
 import { bootScript } from "@/lib/boot";
 import { getResumeHref } from "@/lib/resume";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -60,17 +66,22 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: "/" },
   openGraph: {
-    type: "profile",
-    url: siteUrl,
+    // `website`, not `profile`. LinkedIn's parser only reliably builds a
+    // large image card for `website` and `article`; on `profile` it falls
+    // back to a bare title-and-URL row even when og:image is present.
+    type: "website",
+    url: `${siteUrl}/`,
     siteName: profile.name,
     title: siteName,
     description: siteDescription,
     locale: "en_IN",
+    images: [ogImage],
   },
   twitter: {
     card: "summary_large_image",
     title: siteName,
     description: siteDescription,
+    images: [ogImage],
   },
   robots: {
     index: true,

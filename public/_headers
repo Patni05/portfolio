@@ -1,15 +1,17 @@
 # Cloudflare static-asset headers.
 # Files in public/ are copied to the export root, so this lands at /_headers.
 
-# Next's generated icon and OG image are emitted WITHOUT a file extension, so
-# the host cannot infer their type. Without these two rules the favicon and the
-# social preview are served as octet-stream and silently fail to render.
+# Next's generated icon is emitted WITHOUT a file extension, so the host cannot
+# infer its type. Without this rule the favicon is served as octet-stream and
+# silently fails to render.
 /icon
   Content-Type: image/png
   Cache-Control: public, max-age=3600
 
-/opengraph-image
-  Content-Type: image/png
+# The social preview. Its type IS inferred from the .png extension, so only the
+# cache policy is set here. Kept short so a re-crawl after an image change
+# picks the new file up rather than serving LinkedIn a stale card for a year.
+/og-image.png
   Cache-Control: public, max-age=3600
 
 # Build output is content-hashed, so it can be cached forever.
